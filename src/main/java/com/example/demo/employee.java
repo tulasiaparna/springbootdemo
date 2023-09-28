@@ -12,6 +12,7 @@ public class employee {
 	private int id;
 	private String name;
 	private String email;
+	private String dept;
 	public int getId() {
 		return id;
 	}
@@ -27,8 +28,14 @@ public class employee {
 	public String getEmail() {
 		return email;
 	}
+	public String getDept() {
+		return dept;
+	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public void setDept(String dept) {
+		this.dept = dept;
 	}
 	@Override
 	public String toString() {

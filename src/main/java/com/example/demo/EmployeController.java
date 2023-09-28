@@ -1,8 +1,14 @@
 package com.example.demo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,41 +23,49 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 @RequestMapping("/home")
 public class EmployeController {
+	 
 	 @Autowired
-	 EmployeeRepository repo;
+	 EmployeeService service;
 
-	//@GetMapping("/h")
-    //public ModelAndView roll() {
-    	//System.out.println("model");
-    	//return new ModelAndView("ab");
-    //}
+	public EmployeController(EmployeeService service) {
+		this.service=service;
+	}
+	@CrossOrigin
 	@GetMapping("/")
 	public String func() {
 		return "Hello World";
 	}
+	@CrossOrigin
 	@GetMapping("/display")
-	public List<employee> getEmployees(){
-		return repo.findAll();
+	public ResponseEntity<List<employee>> getEmployees(){
+		return new ResponseEntity<>(service.findall(),HttpStatus.OK);
 	}
-	
+	@CrossOrigin
+	@GetMapping("/display/{id}")
+	public ResponseEntity<employee> getEmployeeById(@PathVariable("id") int id){
+		Optional<employee> emp=service.findbyid(id);
+		if(emp!=null) return new ResponseEntity<>(HttpStatus.FOUND);
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+	@CrossOrigin
 	@PostMapping("/add")
-	public String addEmployee(@RequestBody employee emp) {
-		 repo.save(emp);
-		 return "Success";
+	public ResponseEntity<employee> addEmployee(@RequestBody employee emp) {
+		employee newemp=service.addemployee(emp);
+		return new ResponseEntity<>(newemp,HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping("/delete/{id}")
-	public String deletecustomers(@PathVariable("id") int id) {
-		repo.deleteById(id);
-		return "Deleted "+id+" succesfully";
+	public ResponseEntity<?> deletecustomers(@PathVariable("id") int id) {
+		service.deletebyid(id);
+		return new ResponseEntity<>(HttpStatus.GONE);
 	}
 	
 	@PutMapping("/update/{id}")
-	public String update(@PathVariable("id") int id,@RequestBody employee emp,@RequestParam(required=false) String email,@RequestParam(required=false) String name) {
-		//emp.setName(name);
-		//emp.setEmail(email);
-		emp.setId(id);
-		repo.save(emp);
-		return "updated "+id+" sucessfully";
+	public ResponseEntity<employee> update(@PathVariable("id") int id,@RequestBody employee emp,@RequestParam(required=false) String email,@RequestParam(required=false) String name) {
+		//emp.setId(id);
+		service.save(emp);
+		return new ResponseEntity<>(emp,HttpStatus.ACCEPTED);
 	}
+	
+	
 }
